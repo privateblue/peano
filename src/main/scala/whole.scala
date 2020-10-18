@@ -3,14 +3,18 @@ package peano
 import algebra.ring.{Rig, Ring}
 import algebra.Order
 import cats.kernel.{LowerBoundedEnumerable, UnboundedEnumerable}
+import cats.syntax._
 
 final case class Whole(a: Nat, b: Nat)
 
 object Whole extends WholeInstances {
-    def fromInt(i: Int)(implicit natRig: Rig[Nat]): Whole =
+    def fromNat(n: Nat)(implicit natRig: Rig[Nat]): Whole =
+        Whole(n, natRig.zero)
+
+    def fromInt(i: Int)(implicit natRig: Rig[Nat], wholeRing: Ring[Whole]): Whole =
         i match {
-            case x if x >= 0 => Whole(Nat.fromInt(x), natRig.zero)
-            case x if x < 0 => Whole(natRig.zero, Nat.fromInt(-x))
+            case x if x >= 0 => fromNat(Nat.fromInt(x))
+            case x if x < 0 => wholeRing.negate(fromNat(Nat.fromInt(-x)))
         }
 
     def toBigInt(z: Whole): BigInt =
