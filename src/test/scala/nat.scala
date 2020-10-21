@@ -1,4 +1,4 @@
-package peano
+package peano.nat
 
 import algebra.ring.Rig
 import algebra.Order
@@ -8,55 +8,60 @@ import cats.implicits._
 import org.scalatest._
 import flatspec._
 import matchers._
+import scala.language.implicitConversions // this is needed because of all the implicit conversions in ScalaTest
 
 class NatSpec extends AnyFlatSpec with should.Matchers {
 
+    import Nat._
+
+    val order = summon[Order[Nat]]
+    val enumerable = summon[LowerBoundedEnumerable[Nat]]
+    val rig = summon[Rig[Nat]]
+
     "Nats" should "be constructed from Ints" in {
-        Nat.fromInt(0) shouldBe Z
-        Nat.fromInt(3) shouldBe S(S(S(Z)))
-        Nat.toBigInt(Nat.fromInt(21)).intValue shouldBe 21
+        fromInt(0) shouldBe Z
+        fromInt(3) shouldBe S(S(S(Z)))
+        toBigInt(fromInt(21)).intValue shouldBe 21
     }
 
     it should "convert to Ints" in {
-        Nat.toBigInt(Z).intValue shouldBe 0
-        Nat.toBigInt(S(S(S(S(S(Z)))))).intValue shouldBe 5
-        Nat.fromInt(Nat.toBigInt(S(S(Z))).intValue) shouldBe S(S(Z))
+        toBigInt(Z).intValue shouldBe 0
+        toBigInt(S(S(S(S(S(Z)))))).intValue shouldBe 5
+        fromInt(toBigInt(S(S(Z))).intValue) shouldBe S(S(Z))
     }
 
     "Order of Nats" should "order Nats" in {
-        val x = Nat.fromInt(3)
-        val y = Nat.fromInt(2)
+        val x = fromInt(3)
+        val y = fromInt(2)
 
-        Order[Nat].lteqv(x, y) shouldBe false
-        Order[Nat].lteqv(x, x) shouldBe true
-        Order[Nat].lteqv(y, x) shouldBe true
+        order.lteqv(x, y) shouldBe false
+        order.lteqv(x, x) shouldBe true
+        order.lteqv(y, x) shouldBe true
 
-        val enum = implicitly[LowerBoundedEnumerable[Nat]]
-
-        enum.partialPrevious(enum.next(x)) eqv Some(x) shouldBe true
-        enum.partialPrevious(x).map(enum.next) eqv Some(x) shouldBe true
+        enumerable.partialPrevious(enumerable.next(x)) eqv Some(x) shouldBe true
+        enumerable.partialPrevious(x).map(enumerable.next) eqv Some(x) shouldBe true
     }
 
     "Rig of Nats" should "add Nats" in {
-        val x = Nat.fromInt(3)
-        val y = Nat.fromInt(7)
-        val z = Nat.fromInt(10)
+        val x = fromInt(3)
+        val y = fromInt(7)
+        val z = fromInt(10)
 
-        Rig[Nat].plus(x, y) eqv z shouldBe true
-        Rig[Nat].plus(y, x) eqv z shouldBe true
-        Rig[Nat].plus(x, Z) eqv x shouldBe true
-        Rig[Nat].plus(Z, x) eqv x shouldBe true
+        rig.plus(x, y) eqv z shouldBe true
+        rig.plus(y, x) eqv z shouldBe true
+        rig.plus(x, Z) eqv x shouldBe true
+        rig.plus(Z, x) eqv x shouldBe true
     }
 
     it should "multiply Nats" in {
-        val x = Nat.fromInt(3)
-        val y = Nat.fromInt(2)
-        val z = Nat.fromInt(6)
+        val x = fromInt(3)
+        val y = fromInt(2)
+        val z = fromInt(6)
 
-        Rig[Nat].times(x, y) eqv z shouldBe true
-        Rig[Nat].times(y, x) eqv z shouldBe true
-        Rig[Nat].times(x, Z) eqv Z shouldBe true
-        Rig[Nat].times(Z, x) eqv Z shouldBe true
+        rig.times(x, y) eqv z shouldBe true
+        rig.times(y, x) eqv z shouldBe true
+        rig.times(x, Z) eqv Z shouldBe true
+        rig.times(Z, x) eqv Z shouldBe true
     }
 
 }
