@@ -1,5 +1,7 @@
 package peano.nat
 
+import peano.conversions._
+
 import algebra.ring.Rig
 import algebra.Order
 import cats.kernel.LowerBoundedEnumerable
@@ -14,25 +16,26 @@ class NatSpec extends AnyFlatSpec with should.Matchers {
 
     import Nat._
 
+    val convert = summon[(FromInt[Nat] & ToBigInt[Nat])]
     val order = summon[Order[Nat]]
     val enumerable = summon[LowerBoundedEnumerable[Nat]]
     val rig = summon[Rig[Nat]]
 
     "Nats" should "be constructed from Ints" in {
-        fromInt(0) shouldBe Z
-        fromInt(3) shouldBe S(S(S(Z)))
-        toBigInt(fromInt(21)).intValue shouldBe 21
+        convert.fromInt(0) shouldBe Z
+        convert.fromInt(3) shouldBe S(S(S(Z)))
+        convert.toBigInt(convert.fromInt(21)).intValue shouldBe 21
     }
 
     it should "convert to Ints" in {
-        toBigInt(Z).intValue shouldBe 0
-        toBigInt(S(S(S(S(S(Z)))))).intValue shouldBe 5
-        fromInt(toBigInt(S(S(Z))).intValue) shouldBe S(S(Z))
+        convert.toBigInt(Z).intValue shouldBe 0
+        convert.toBigInt(S(S(S(S(S(Z)))))).intValue shouldBe 5
+        convert.fromInt(convert.toBigInt(S(S(Z))).intValue) shouldBe S(S(Z))
     }
 
     "Order of Nats" should "order Nats" in {
-        val x = fromInt(3)
-        val y = fromInt(2)
+        val x = convert.fromInt(3)
+        val y = convert.fromInt(2)
 
         order.lteqv(x, y) shouldBe false
         order.lteqv(x, x) shouldBe true
@@ -43,9 +46,9 @@ class NatSpec extends AnyFlatSpec with should.Matchers {
     }
 
     "Rig of Nats" should "add Nats" in {
-        val x = fromInt(3)
-        val y = fromInt(7)
-        val z = fromInt(10)
+        val x = convert.fromInt(3)
+        val y = convert.fromInt(7)
+        val z = convert.fromInt(10)
 
         rig.plus(x, y) eqv z shouldBe true
         rig.plus(y, x) eqv z shouldBe true
@@ -54,9 +57,9 @@ class NatSpec extends AnyFlatSpec with should.Matchers {
     }
 
     it should "multiply Nats" in {
-        val x = fromInt(3)
-        val y = fromInt(2)
-        val z = fromInt(6)
+        val x = convert.fromInt(3)
+        val y = convert.fromInt(2)
+        val z = convert.fromInt(6)
 
         rig.times(x, y) eqv z shouldBe true
         rig.times(y, x) eqv z shouldBe true

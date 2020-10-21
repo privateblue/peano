@@ -1,5 +1,7 @@
 package peano.nat
 
+import peano.conversions._
+
 import algebra.ring.Rig
 import algebra.Order
 import cats.kernel.LowerBoundedEnumerable
@@ -9,19 +11,6 @@ import scala.math.BigInt
 enum Nat:
     case Z
     case S(n: Nat)
-
-def fromInt(i: Int): Nat =
-    if i < 0 then throw new IllegalArgumentException("Not a natural number")
-    else if i == 0 then Nat.Z
-    else 0.until(i).foldLeft(Nat.Z)((n, _) => Nat.S(n))
-
-def toBigInt(n: Nat): BigInt =
-    @scala.annotation.tailrec
-    def loop(n1: Nat, c: BigInt): BigInt =
-        n1 match
-            case Nat.Z => c
-            case Nat.S(x) => loop(x, c + 1)
-    loop(n, 0)
 
 class NatOrder extends Order[Nat] with LowerBoundedEnumerable[Nat]:
     @scala.annotation.tailrec
@@ -68,3 +57,20 @@ class NatRig extends Rig[Nat]:
 end NatRig
 
 given Rig[Nat] = new NatRig
+
+given (FromInt[Nat] &  ToBigInt[Nat]) = new FromInt[Nat] with ToBigInt[Nat] {
+    def fromInt(i: Int): Nat =
+        if i < 0 then throw new IllegalArgumentException("Not a natural number")
+        else if i == 0 then Nat.Z
+        else 0.until(i).foldLeft(Nat.Z)((n, _) => Nat.S(n))
+
+    def toBigInt(n: Nat): BigInt =
+        @scala.annotation.tailrec
+        def loop(n1: Nat, c: BigInt): BigInt =
+            n1 match
+                case Nat.Z => c
+                case Nat.S(x) => loop(x, c + 1)
+        loop(n, 0)
+}
+
+
