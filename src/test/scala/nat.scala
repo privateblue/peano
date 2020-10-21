@@ -26,15 +26,15 @@ class NatSpec extends AnyFlatSpec with should.Matchers {
     "Order of Nats" should "order Nats" in {
         val x = Nat.fromInt(3)
         val y = Nat.fromInt(2)
-
+ 
         Order[Nat].lteqv(x, y) shouldBe false
         Order[Nat].lteqv(x, x) shouldBe true
         Order[Nat].lteqv(y, x) shouldBe true
 
-        val enum = implicitly[LowerBoundedEnumerable[Nat]]
+        val enumerable = implicitly[LowerBoundedEnumerable[Nat]]
 
-        enum.partialPrevious(enum.next(x)) eqv Some(x) shouldBe true
-        enum.partialPrevious(x).map(enum.next) eqv Some(x) shouldBe true
+        enumerable.partialPrevious(enumerable.next(x)) eqv Some(x) shouldBe true
+        enumerable.partialPrevious(x).map(enumerable.next) eqv Some(x) shouldBe true
     }
 
     "Rig of Nats" should "add Nats" in {

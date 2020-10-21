@@ -33,11 +33,11 @@ class WholeSpec extends AnyFlatSpec with should.Matchers {
         Order[Whole].lteqv(x, x) shouldBe true
         Order[Whole].lteqv(y, y) shouldBe true
         Order[Whole].lteqv(y, x) shouldBe true
+      
+        val enumerable = implicitly[UnboundedEnumerable[Whole]]
 
-        val enum = implicitly[UnboundedEnumerable[Whole]]
-
-        enum.previous(enum.next(y)) eqv y shouldBe true
-        enum.next(enum.previous(y)) eqv y shouldBe true
+        enumerable.previous(enumerable.next(y)) eqv y shouldBe true
+        enumerable.next(enumerable.previous(y)) eqv y shouldBe true
     }
 
     "Ring of Whole" should "add Wholes" in {
@@ -84,4 +84,5 @@ class WholeSpec extends AnyFlatSpec with should.Matchers {
         Ring[Whole].times(z, x) eqv z shouldBe true
         Ring[Whole].times(z, y) eqv z shouldBe true
     }
+
 }

@@ -1,4 +1,8 @@
-package peano
+package peano.whole
+
+import peano.nat
+import nat.{given _}
+import nat.Nat
 
 import algebra.ring.{Rig, Ring}
 import algebra.Order
@@ -7,46 +11,36 @@ import cats.syntax._
 
 final case class Whole(a: Nat, b: Nat)
 
-object Whole extends WholeInstances {
-    def fromNat(n: Nat)(implicit natRig: Rig[Nat]): Whole =
-        Whole(n, natRig.zero)
+def fromNat(n: Nat)(implicit natRig: Rig[Nat]): Whole =
+    Whole(n, natRig.zero)
 
-    def fromInt(i: Int)(implicit natRig: Rig[Nat], wholeRing: Ring[Whole]): Whole =
-        i match {
-            case x if x >= 0 => fromNat(Nat.fromInt(x))
-            case x if x < 0 => wholeRing.negate(fromNat(Nat.fromInt(-x)))
-        }
+def fromInt(i: Int)(implicit natRig: Rig[Nat], wholeRing: Ring[Whole]): Whole =
+    i match
+        case x if x >= 0 => fromNat(nat.fromInt(x))
+        case x if x < 0 => wholeRing.negate(fromNat(nat.fromInt(-x)))
 
-    def toBigInt(z: Whole): BigInt =
-        Nat.toBigInt(z.a) - Nat.toBigInt(z.b)
-}
+def toBigInt(z: Whole): BigInt =
+    nat.toBigInt(z.a) - nat.toBigInt(z.b)
 
-trait WholeInstances {
-    implicit val wholeOrder: Order[Whole] with UnboundedEnumerable[Whole] =
-        new WholeOrder
-
-    implicit val wholeRing: Ring[Whole] =
-        new WholeRing
-}
-
-class WholeOrder(implicit
+class WholeOrder(using
     natOrder: Order[Nat] with LowerBoundedEnumerable[Nat],
     natRig: Rig[Nat]
-) extends Order[Whole] with UnboundedEnumerable[Whole] { self =>
-
+) extends Order[Whole] with UnboundedEnumerable[Whole]:
     def compare(z1: Whole, z2: Whole): Int =
         natOrder.compare(natRig.plus(z1.a, z2.b), natRig.plus(z1.b, z2.a))
 
-    val order = self
+    val order = this
 
     def next(z: Whole): Whole =
         Whole(natOrder.next(z.a), z.b)
 
     def previous(z: Whole): Whole =
         Whole(z.a, natOrder.next(z.b))
-}
+end WholeOrder
 
-class WholeRing(implicit natRig: Rig[Nat]) extends Ring[Whole] {
+given (Order[Whole] | UnboundedEnumerable[Whole]) = new WholeOrder
+
+class WholeRing(implicit natRig: Rig[Nat]) extends Ring[Whole]:
     def negate(z: Whole): Whole =
         Whole(z.b, z.a)
 
@@ -68,4 +62,6 @@ class WholeRing(implicit natRig: Rig[Nat]) extends Ring[Whole] {
                 natRig.times(z1.b, z2.a)
             )
         )
-}
+end WholeRing
+
+given Ring[Whole] = new WholeRing
