@@ -60,7 +60,7 @@ given Rig[Nat] = new NatRig
 
 given (FromInt[Nat] &  ToBigInt[Nat]) = new FromInt[Nat] with ToBigInt[Nat] {
     def fromInt(i: Int): Nat =
-        if i < 0 then throw new IllegalArgumentException("Not a natural number")
+        if i < 0 then throw peano.errors.NonNat(i)
         else if i == 0 then Nat.Z
         else 0.until(i).foldLeft(Nat.Z)((n, _) => Nat.S(n))
 
