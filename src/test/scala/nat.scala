@@ -2,7 +2,7 @@ package peano.nat
 
 import peano.conversions._
 
-import algebra.ring.Rig
+import algebra.ring.CommutativeRig
 import algebra.Order
 import cats.kernel.LowerBoundedEnumerable
 import cats.implicits._
@@ -19,7 +19,7 @@ class NatSpec extends AnyFlatSpec with should.Matchers {
     val convert = summon[(FromInt[Nat] & ToBigInt[Nat])]
     val order = summon[Order[Nat]]
     val enumerable = summon[LowerBoundedEnumerable[Nat]]
-    val rig = summon[Rig[Nat]]
+    val rig = summon[CommutativeRig[Nat]]
 
     "Nats" should "be constructed from Ints" in {
         convert.fromInt(0) shouldBe Z

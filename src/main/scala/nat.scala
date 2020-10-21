@@ -2,7 +2,7 @@ package peano.nat
 
 import peano.conversions._
 
-import algebra.ring.Rig
+import algebra.ring.CommutativeRig
 import algebra.Order
 import cats.kernel.LowerBoundedEnumerable
 
@@ -35,7 +35,7 @@ end NatOrder
 
 given (Order[Nat] & LowerBoundedEnumerable[Nat]) = new NatOrder
 
-class NatRig extends Rig[Nat]:
+class NatRig extends CommutativeRig[Nat]:
     val zero: Nat = Nat.Z
 
     @scala.annotation.tailrec
@@ -56,7 +56,7 @@ class NatRig extends Rig[Nat]:
         loop(n1, zero)
 end NatRig
 
-given Rig[Nat] = new NatRig
+given CommutativeRig[Nat] = new NatRig
 
 given (FromInt[Nat] &  ToBigInt[Nat]) = new FromInt[Nat] with ToBigInt[Nat] {
     def fromInt(i: Int): Nat =
