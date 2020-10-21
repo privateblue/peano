@@ -7,7 +7,6 @@ import nat.Nat
 import algebra.ring.{Rig, Ring}
 import algebra.Order
 import cats.kernel.{LowerBoundedEnumerable, UnboundedEnumerable}
-import cats.syntax._
 
 final case class Whole(a: Nat, b: Nat)
 
@@ -23,7 +22,8 @@ def toBigInt(z: Whole): BigInt =
     nat.toBigInt(z.a) - nat.toBigInt(z.b)
 
 class WholeOrder(using
-    natOrder: Order[Nat] with LowerBoundedEnumerable[Nat],
+    natOrder: Order[Nat],
+    natEnumerable: LowerBoundedEnumerable[Nat],
     natRig: Rig[Nat]
 ) extends Order[Whole] with UnboundedEnumerable[Whole]:
     def compare(z1: Whole, z2: Whole): Int =
@@ -32,13 +32,13 @@ class WholeOrder(using
     val order = this
 
     def next(z: Whole): Whole =
-        Whole(natOrder.next(z.a), z.b)
+        Whole(natEnumerable.next(z.a), z.b)
 
     def previous(z: Whole): Whole =
-        Whole(z.a, natOrder.next(z.b))
+        Whole(z.a, natEnumerable.next(z.b))
 end WholeOrder
 
-given (Order[Whole] | UnboundedEnumerable[Whole]) = new WholeOrder
+given (Order[Whole] & UnboundedEnumerable[Whole]) = new WholeOrder
 
 class WholeRing(implicit natRig: Rig[Nat]) extends Ring[Whole]:
     def negate(z: Whole): Whole =

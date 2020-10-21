@@ -44,7 +44,7 @@ class NatOrder extends Order[Nat] with LowerBoundedEnumerable[Nat]:
             case Nat.S(x) => Some(x)
 end NatOrder
 
-given (Order[Nat] | LowerBoundedEnumerable[Nat]) = new NatOrder
+given (Order[Nat] & LowerBoundedEnumerable[Nat]) = new NatOrder
 
 class NatRig extends Rig[Nat]:
     val zero: Nat = Nat.Z
