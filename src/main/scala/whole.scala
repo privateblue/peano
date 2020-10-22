@@ -56,7 +56,7 @@ class WholeRing[N : CommutativeRig] extends CommutativeRing[Whole[N]]:
         )
 end WholeRing
 
-given [N : CommutativeRig ] as CommutativeRing[Whole[N]] = new WholeRing[N]
+given [N: CommutativeRig] as CommutativeRing[Whole[N]] = new WholeRing[N]
 
 given [N: FromInt : ToBigInt : CommutativeRig] as (FromInt[Whole[N]] & ToBigInt[Whole[N]]) = new FromInt[Whole[N]] with ToBigInt[Whole[N]] {
     def fromInt(i: Int): Whole[N] =
