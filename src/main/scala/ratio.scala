@@ -19,16 +19,16 @@ object Ratio:
 
 def embed[N: CommutativeRing : Order](n: N): Ratio[N] =
     Ratio(n, summon[CommutativeRing[N]].one)
-    
+
 class RatioOrder[N: CommutativeRing : Order] extends Order[Ratio[N]]:
     val norder = summon[Order[N]]
     val nring = summon[CommutativeRing[N]]
-    
+
     def compare(r1: Ratio[N], r2: Ratio[N]): Int =
         norder.compare(nring.times(r1.num, r2.den), nring.times(r1.den, r2.num))
 end RatioOrder
 
-given [N: CommutativeRing : Order] as Order[Ratio[N]] = new RatioOrder[N]
+given [N: CommutativeRing : Order]: Order[Ratio[N]] = new RatioOrder[N]
 
 class RatioField[N: CommutativeRing : Order](using Eq[Ratio[N]]) extends Field[Ratio[N]]:
     val nring = summon[CommutativeRing[N]]
@@ -58,9 +58,9 @@ class RatioField[N: CommutativeRing : Order](using Eq[Ratio[N]]) extends Field[R
     }
 end RatioField
 
-given [N: CommutativeRing : Order](using Eq[Ratio[N]]) as Field[Ratio[N]] = new RatioField[N]
+given [N: CommutativeRing : Order](using Eq[Ratio[N]]): Field[Ratio[N]] = new RatioField[N]
 
-given [N: FromInt : ToBigInt : CommutativeRing : Order] as (FromString[Ratio[N]] & ToString[Ratio[N]]) = new FromString[Ratio[N]] with ToString[Ratio[N]] {
+given [N: FromInt : ToBigInt : CommutativeRing : Order]: (FromString[Ratio[N]] & ToString[Ratio[N]]) = new FromString[Ratio[N]] with ToString[Ratio[N]] {
     def fromString(s: String): Ratio[N] =
         val nconvert = summon[FromInt[N]]
         val nring = summon[CommutativeRing[N]]
